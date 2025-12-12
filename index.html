@@ -1,40 +1,272 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Đọc Truyện Free</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 700px;
-            margin: auto;
-            padding: 20px;
-        }
-        .chapter {
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        a {
-            text-decoration: none;
-            color: blue;
-        }
-        h1, h2 {
-            text-align: center;
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Thư viện truyện — wanttowrite</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#f7f7f9; --card:#ffffff; --muted:#6b7280; --accent:#7c3aed; --text:#0f172a;
+    --glass: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+  }
+  [data-theme="dark"]{
+    --bg:#0b1020; --card:#071024; --muted:#94a3b8; --accent:#8b5cf6; --text:#e6eef8;
+    --glass: linear-gradient(180deg, rgba(15,23,42,0.6), rgba(7,10,36,0.4));
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    background:var(--bg); color:var(--text);
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    padding:28px;
+  }
+
+  .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:320px 1fr;gap:28px;align-items:start}
+  header{grid-column:1/-1; display:flex; justify-content:space-between; align-items:center; margin-bottom:6px}
+  .brand{display:flex; gap:12px; align-items:center}
+  .logo{width:48px;height:48px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+  h1{font-size:20px;margin:0}
+  .sub{color:var(--muted); font-size:13px}
+
+  /* sidebar */
+  .sidebar{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(2,6,23,0.08)}
+  .search{display:flex;gap:8px;margin-bottom:12px}
+  .search input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);outline:none;background:transparent}
+  .story-card{padding:12px;border-radius:10px;background:var(--glass);margin-bottom:10px}
+  .story-title{font-weight:700}
+  .meta{color:var(--muted);font-size:13px;margin-top:6px}
+
+  /* main content */
+  .main{background:var(--card);border-radius:12px;padding:22px;box-shadow:0 6px 20px rgba(2,6,23,0.06)}
+  .chapter-title{font-size:22px;margin:0 0 8px 0}
+  .chapter-meta{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .content{line-height:1.9;font-size:17px;white-space:pre-line}
+  .nav-chapters{display:flex;justify-content:space-between;margin-top:22px;gap:12px}
+  .btn{
+    display:inline-block;padding:10px 14px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,0.03),rgba(0,0,0,0.01));
+    text-decoration:none;color:var(--text);border:1px solid rgba(0,0,0,0.04);font-weight:600
+  }
+  .btn.accent{background:linear-gradient(180deg,var(--accent),#5b21b6);color:white;border:0;box-shadow:0 6px 18px rgba(124,58,237,0.18)}
+  .small{font-size:13px;color:var(--muted)}
+  footer{grid-column:1/-1;text-align:center;margin-top:18px;color:var(--muted);font-size:13px}
+
+  /* responsive */
+  @media (max-width:880px){
+    .wrap{grid-template-columns:1fr; padding:12px}
+    .sidebar{order:2}
+    header{flex-direction:column;align-items:flex-start;gap:10px}
+  }
+
+  /* dark mode toggle */
+  .toggle{
+    display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid rgba(0,0,0,0.06);padding:8px;border-radius:999px;
+  }
+</style>
 </head>
 <body>
-    <a href="chuong1.html">→ Chương 1</a><br>
-<h1>📚 Web Truyện Của Tao</h1>
-<h2>Danh sách truyện</h2>
 
-<ul>
-    <li><a href="truyen1-chuong1.html">Truyện 1 – Chương 1</a></li>
-</ul>
+<div class="wrap" id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">WT</div>
+      <div>
+        <h1>WannaWrite — Thư viện truyện</h1>
+        <div class="sub">Miễn phí • GitHub Pages • Nhẹ & responsive</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="small">Hiện: <span id="reader-count">—</span> độc giả</div>
+      <button class="toggle" id="dmToggle" title="Bật/tắt chế độ tối">🌓 Dark</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong>Danh sách truyện</strong>
+      <a class="small" href="#" id="new-story">+ Thêm</a>
+    </div>
+
+    <div class="search">
+      <input id="q" placeholder="Tìm truyện, chương..." oninput="filterList()" />
+      <button class="btn" onclick="filterList()">Tìm</button>
+    </div>
+
+    <div id="stories">
+      <!-- each story rendered here -->
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div id="mainArea">
+      <h2 class="chapter-title" id="title">Chọn truyện để xem</h2>
+      <div class="chapter-meta" id="meta">Danh sách chương sẽ hiện ở bên trái — bấm vào để đọc.</div>
+      <div class="content" id="content">
+        Muốn nhanh thì bấm 1 chương ở sidebar, tao đã chuẩn bị mẫu chương cho ông rồi.
+      </div>
+      <div class="nav-chapters" id="nav">
+        <a id="prevBtn" class="btn" href="#" style="visibility:hidden">← Chương trước</a>
+        <a id="nextBtn" class="btn accent" href="#" style="visibility:hidden">Chương tiếp →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>© WannaWrite • Tự host trên GitHub Pages — Làm sao muốn thêm tính năng thì bảo tao</footer>
+</div>
+
+<script>
+/* =============== DỮ LIỆU TRUYỆN ===============
+ Format:
+ stories = [
+   {
+     id: "truyen-1",
+     title: "Tên Truyện",
+     author: "Tác giả",
+     description: "Mô tả ngắn",
+     chapters: [
+       { file: "chuong-1.html", title: "Chương 1: Khởi đầu" },
+       { file: "chuong-2.html", title: "Chương 2: ..." }
+     ]
+   }
+ ]
+================================================*/
+
+/* ==== Ở đây ông chỉnh tên truyện + file chương ==== */
+const stories = [
+  {
+    id:"truyen1",
+    title:"Truyện Thử Nghiệm",
+    author:"Tác giả: Bạn",
+    description:"Truyện demo để test giao diện. Thay nội dung và tạo file chương tương ứng.",
+    chapters:[
+      {file:"truyen1-chuong1.html", title:"Chương 1 — Khởi đầu"},
+      {file:"truyen1-chuong2.html", title:"Chương 2 — Tiếp tục"}
+    ]
+  }
+];
+
+const storiesEl = document.getElementById('stories');
+const q = document.getElementById('q');
+const titleEl = document.getElementById('title');
+const metaEl = document.getElementById('meta');
+const contentEl = document.getElementById('content');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function renderList(list){
+  storiesEl.innerHTML = '';
+  list.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'story-card';
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="story-title">${s.title}</div>
+          <div class="meta">${s.author}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="small">${s.chapters.length} chương</div>
+          <a class="btn" href="#" onclick="openStory('${s.id}');return false">Xem</a>
+        </div>
+      </div>
+      <div class="small" style="margin-top:10px">${s.description}</div>
+    `;
+    storiesEl.appendChild(el);
+  });
+}
+
+function filterList(){
+  const t = q.value.trim().toLowerCase();
+  if(!t){ renderList(stories); return; }
+  const filtered = stories.filter(s => (s.title + ' ' + s.author + ' ' + s.description).toLowerCase().includes(t));
+  renderList(filtered);
+}
+
+/* mở 1 truyện -> hiển thị danh sách chương */
+function openStory(id){
+  const s = stories.find(x=>x.id===id);
+  if(!s) return;
+  titleEl.textContent = s.title;
+  metaEl.textContent = `${s.author} • ${s.chapters.length} chương`;
+  // render chapters list inside content area
+  let html = '<ol>';
+  s.chapters.forEach((c, idx) => {
+    html += `<li style="margin-bottom:8px"><a href="${c.file}" class="btn" style="padding:8px 10px" onclick="openChapter(event, '${id}', ${idx})">${c.title}</a></li>`;
+  });
+  html += '</ol>';
+  contentEl.innerHTML = html;
+  prevBtn.style.visibility = 'hidden';
+  nextBtn.style.visibility = 'hidden';
+}
+
+/* mở chương nội bộ (ajax fetch) */
+let current = { storyId:null, idx:-1 };
+async function openChapter(ev, storyId, idx){
+  if(ev) ev.preventDefault();
+  const s = stories.find(x=>x.id===storyId);
+  if(!s) return;
+  const ch = s.chapters[idx];
+  // fetch file content (must be in repo)
+  try{
+    const res = await fetch(ch.file);
+    if(!res.ok) throw new Error('Không tìm thấy file chương: ' + ch.file);
+    const text = await res.text();
+    // parse title + body from fetched html (simple heuristic)
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+    const h = doc.querySelector('h1') ? doc.querySelector('h1').textContent : ch.title;
+    const b = doc.querySelector('.chapter-body') ? doc.querySelector('.chapter-body').innerHTML : doc.body.innerHTML;
+    titleEl.textContent = h;
+    metaEl.textContent = `${s.title} • ${s.author}`;
+    contentEl.innerHTML = b;
+    // set nav
+    current = {storyId, idx};
+    if(idx>0){
+      prevBtn.style.visibility = 'visible';
+      prevBtn.href = s.chapters[idx-1].file;
+      prevBtn.onclick = (e)=>{ openChapter(e, storyId, idx-1); };
+    } else prevBtn.style.visibility = 'hidden';
+    if(idx < s.chapters.length -1){
+      nextBtn.style.visibility = 'visible';
+      nextBtn.href = s.chapters[idx+1].file;
+      nextBtn.onclick = (e)=>{ openChapter(e, storyId, idx+1); };
+    } else nextBtn.style.visibility = 'hidden';
+    // scroll to top
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){
+    contentEl.innerHTML = `<div style="color:#c84c4c">Lỗi: ${err.message}</div>`;
+  }
+}
+
+/* dark mode toggle */
+const dm = document.getElementById('dmToggle');
+function loadTheme(){
+  const t = localStorage.getItem('ww-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if(t==='dark') document.documentElement.setAttribute('data-theme','dark');
+  else document.documentElement.removeAttribute('data-theme');
+}
+loadTheme();
+dm.addEventListener('click', ()=>{
+  const now = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light':'dark';
+  if(now==='dark') document.documentElement.setAttribute('data-theme','dark');
+  else document.documentElement.removeAttribute('data-theme');
+  localStorage.setItem('ww-theme', now);
+});
+
+/* render initial */
+renderList(stories);
+
+/* optional: simple reader count (fake) */
+document.getElementById('reader-count').textContent = Math.floor(Math.random()*30 + 5);
+</script>
 
 </body>
 </html>
